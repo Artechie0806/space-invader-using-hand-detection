@@ -9,7 +9,8 @@ import pygame_gesture_kit.hand_visualizer
 
 
 
-
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
 
@@ -20,11 +21,18 @@ pygame.init()
 # create the screen
 screen = pygame.display.set_mode((1200, 720))
 
+text="Close your hand to shoot"
+position = (50, 50)  # Coordinates where you want to place the text
+font_scale = 1
+color = (000, 000, 255)  # Color of the text in BGR format
+thickness = 2  # Thickness of the text
+
+
 # Background
 background = pygame.image.load('Space-Invaders-Pygame-master/background.png')
 
 # Sound
-mixer.music.load("Space-Invaders-Pygame-master/background.wav")
+mixer.music.load("Space-Invaders-Pygame-master\space-invaders-classic-arcade-game-116826.mp3")
 mixer.music.play(-1)
 
 # Caption and Icon
@@ -151,7 +159,7 @@ while running:
         results = hands.process(image)
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
-                    x = hand_landmarks.landmark[0].x
+                    x = hand_landmarks.landmark[9].x
                     playerX = x*1200
                     if playerX <= 0:
                         playerX = 0
@@ -167,7 +175,14 @@ while running:
                             bulletX = playerX
                             fire_bullet(bulletX, bulletY)
                         else:
-                            continue
+                            continue 
+            mp_drawing.draw_landmarks(
+            image,
+            hand_landmarks,
+            mp_hands.HAND_CONNECTIONS,
+            mp_drawing_styles.get_default_hand_landmarks_style(),
+            mp_drawing_styles.get_default_hand_connections_style())
+        cv2.imshow('close Hand to shoot', image)
     
     # Enemy Movement
     for i in range(num_of_enemies):
@@ -202,7 +217,7 @@ while running:
 
     # Bullet Movement
     if bulletY <= 0:
-        bulletY = 700
+        bulletY = 600
         bullet_state = "ready"
 
     if bullet_state == "fire":
